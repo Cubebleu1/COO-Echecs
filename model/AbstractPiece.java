@@ -26,10 +26,11 @@ public abstract class AbstractPiece implements Pieces {
 				+ this.coord.toString();
 	}
 	
+	public abstract boolean isMoveOk(int xFinal, int yFinal);
+	
 	public boolean move(int xFinal, int yFinal) {
 		if (this.isMoveOk(xFinal, yFinal)) {
-			this.coord.x = xFinal;
-			this.coord.y = yFinal; //Public attributes in coord :( ...
+			
 			return true;
 		} else {return false;}
 	}
@@ -51,6 +52,14 @@ public abstract class AbstractPiece implements Pieces {
 	public int getX() {return this.coord.x;}
 	//Encapsulation ? Either way, never return coord, but always a copy !
 	public int getY() {return this.coord.y;}
+	
+	protected boolean setCoord(int xFinal, int yFinal) {
+		if(Coord.coordonnees_valides(xFinal, yFinal)) { //TODO : Return false if moving on the same coord ?
+			this.coord.x = xFinal;
+			this.coord.y = yFinal; //Public attributes in coord :( ...
+			return true;
+		} else {return false;}
+	}
 	
 	// ========== TESTS ==========
 	
@@ -84,6 +93,25 @@ public abstract class AbstractPiece implements Pieces {
 		System.out.println(maReine.move(2, 4)); // True, bishop movement
 		System.out.println(maReine.move(3, 6)); // False, l-Shaped
 		System.out.println(maReine);
+		
+		System.out.println("========== TESTS ROI ==========");
+		Pieces monRoi = new Roi(Couleur.NOIR, new Coord(0,0));
+		System.out.println(monRoi);
+		System.out.println(monRoi.move(1, 1)); //True, one diagonal movement
+		System.out.println(monRoi.move(1, 3)); //False, moved two spaces
+		System.out.println(monRoi.move(2, 1)); // True, one horizontal movement
+		System.out.println(monRoi.move(2, 2)); // True, one vertical movement
+		System.out.println(monRoi.move(3, 6)); // False
+		System.out.println(monRoi);
+		
+		System.out.println("========== TESTS PION ==========");
+		Pieces monPion = new Pion(Couleur.NOIR, new Coord(0,0));
+		System.out.println(monPion);
+		System.out.println(monPion.move(2, 0)); //True, two spaces
+		System.out.println(monPion.move(3, 0)); // True, one spaces after first movement
+		System.out.println(monPion.move(1, 2)); // False, moved horizontaly
+		System.out.println(monPion.move(5, 0)); // False, moved two spaces after first movement
+		System.out.println(monPion);
 	}
 	
 }
