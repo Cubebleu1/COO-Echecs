@@ -12,11 +12,9 @@ public class Fou extends AbstractPiece {
 	
 	@Override
 	public boolean isMoveOk(int xFinal, int yFinal) {
-		if(!Coord.coordonnees_valides(this.getX(), this.getY())
-			|| (xFinal == this.getX() && yFinal == this.getY()) ) { //Return false if moving on the same coord ?
-				return false;
-		} else if ( Math.abs(xFinal-this.getX()) == Math.abs(yFinal-this.getY()) ) {
-			return true;
+		if ( Math.abs(xFinal-this.getX()) == Math.abs(yFinal-this.getY())) {
+			if (this.setCoord(xFinal, yFinal)) {return true;}
+			return false;
 		} else {return false;}
 	}
 

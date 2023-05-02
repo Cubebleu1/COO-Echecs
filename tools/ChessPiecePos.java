@@ -30,7 +30,8 @@ public enum ChessPiecePos {
 	public  Coord[] coords = new Coord[8] ;   
 
 	ChessPiecePos( String nom, Couleur couleur, Coord[] coords) { 
-		this.nom = nom;this.couleur = couleur;
+		this.nom = nom;
+		this.couleur = couleur;
 		this.coords = coords;
 	} 
 

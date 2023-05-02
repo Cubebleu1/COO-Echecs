@@ -12,12 +12,10 @@ public class Cavalier extends AbstractPiece {
 
 	@Override
 	public boolean isMoveOk(int xFinal, int yFinal) {
-		if(!Coord.coordonnees_valides(this.getX(), this.getY())
-			|| (xFinal == this.getX() && yFinal == this.getY()) ) { //Return false if moving on the same coord ?
-				return false;
-		} else if ((xFinal == this.getX()+2 && yFinal == this.getY()+1)  //L-shaped movement
-				|| (xFinal == this.getX()+1 && yFinal == this.getY()+2)) {
-			return true;
+		if ((xFinal == this.getX()+2 && yFinal == this.getY()+1)  //L-shaped movement
+		|| (xFinal == this.getX()+1 && yFinal == this.getY()+2)) {
+			if (this.setCoord(xFinal, yFinal)) {return true;}
+			return false;
 		} else {return false;}
 	}
 
