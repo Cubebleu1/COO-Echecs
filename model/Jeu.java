@@ -35,31 +35,43 @@ public class Jeu {
 		return str;
 	}
 	
-	public boolean isMoveOk(int xInit, int yInit, int xFinal, int yFinal) {
+	private boolean isMoveOk(int xInit, int yInit, int xFinal, int yFinal) {
 		if (xInit == xFinal && yFinal == yInit){return false;} //No movement
-		//String pieceClass = this.getPieceType(xInit, yInit);
 		Pieces piece = this.getPiece(xInit, yInit);
 		if (piece instanceof JumpOver) {return !this.isPieceHere(xFinal, yFinal);} //Jump over friends if not on destination
 		else {
-			int x = 0; int y = 0;
-			int dx = xFinal-xInit ; int dy = yFinal-yInit; //br de cases dans chaque dimmension
+			int x = 0; int y = 0; //coordinates between xInit and xFinal
+			int dx = Math.abs(xFinal-xInit) ; int dy = Math.abs(yFinal-yInit); //number of spaces for each dimension
+			//Vertical : dy = 0 ;  Horizontal : dx = 0 ; Diagonal : dx = dy
 			for (int i = 0; i < Math.max(dx, dy); i++) {
-				// On incrémente x/y si o navance (xFinal > xInit), sinon on le décrémente. Si ils sont égaux
-				// le variation (dx == x/dy == y) 
-				if (xFinal < xInit && x > dx) {x = x-1;} else if (xFinal > xInit && x < dx) {x++;}
-				if (yFinal < yInit && y > dy) {y = y-1;} else if (xFinal > xInit && y < dy) {y++;}
+				// increments x and y while reaching destination. Stop incrementing when final is reached.
+				if (xFinal < xInit && x > -dx) {x = x-1;} else if (xFinal > xInit && x < dx) {x++;}
+				//-dx since x is descending : starts at x=0, then at x = xInit-xFinal = -dx
+				// => if xInit = 7 and xFinal = 5, dx = 2 and x=0, then x=-1, then x=-2
+				if (yFinal < yInit && y > -dy) {y = y-1;} else if (yFinal > yInit && y < dy) {y++;}
 				if (this.isPieceHere(xInit+x, yInit+y)) {return false;};
 			} 
 		} 
 		return true;
 	}
 	
-	private boolean isPieceHere(int x, int y) {
+	public boolean move(int xInit, int yInit, int xFinal, int yFinal) {
+		if(this.isMoveOk(xInit, yInit, xFinal, yFinal)) {
+			return this.getPiece(xInit, yInit).move(xFinal, yFinal);
+		} return false;
+	}
+	
+	public boolean isPieceHere(int x, int y) {
 		for (int i = 0; i < this.pieces.size(); i++) {
 			if (this.pieces.get(i).getX() == x && this.pieces.get(i).getY() == y ) {return true;}
 		} return false;
 	}
 	
+	public boolean capture(int x, int y) {
+		if (this.getPiece(x, y).getClass().getSimpleName().equals("Roi")){System.out.println("Le joueur "+this.getCouleur()+" a perdu...");} //Lost the king => Defeat
+		this.getPiece(x, y).capture(); //Capture this piece (put it's coordinates to (-1;-1))
+		return true; //Is there more to do ? How could a capture be not valid ? TODO TODO 
+	}
 	
 	
 	// ========== GETTERS/SETTERS ==========
@@ -68,7 +80,7 @@ public class Jeu {
 	
 	private Coord getKingCoord() {return new Coord(this.king.getX(), this.king.getY());}
 	
-	private Pieces getPiece(int x, int y) {
+	public Pieces getPiece(int x, int y) {
 		for (int i = 0; i < this.pieces.size(); i++) {
 			if (this.pieces.get(i).getX() == x && this.pieces.get(i).getY() == y ) {return this.pieces.get(i);}
 		} return null;
@@ -116,5 +128,12 @@ public class Jeu {
 		System.out.println(monJeu.getPiece(0, 7)); //tower
 		System.out.println(monJeu.getPieceColor(0, 7));
 		System.out.println(monJeu.getPiecesIHM());
+		System.out.println(monJeu.move(0, 7, 0, 7)); // False : no movement
+		System.out.println(monJeu.move(0, 7, 0, 6)); // False : destination is taken
+		System.out.println(monJeu.move(0, 7, 0, 5)); // False : Pion is on path
+		System.out.println(monJeu.move(0, 6, 0, 5)); // True : Pion can move one spot ahead
+		System.out.println(monJeu.move(6, 7, 5, 5)); // True : Cavalier can jump over friends
+		System.out.println(monJeu.move(4, 7, 4, 6)); // False : King on Pion
+		System.out.println(monJeu.move(2, 7, 4, 5)); // False : Pion is on path
 	}
 }

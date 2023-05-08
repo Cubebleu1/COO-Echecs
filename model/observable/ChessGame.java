@@ -44,6 +44,8 @@ public class ChessGame extends Observable implements BoardGames{
 		st = echiquier.toString();	
 		return  st;
 	}
+	
+	public boolean isPlayerOK(int xInit, int yInit) {return this.echiquier.isPlayerOK(xInit, yInit);}
 
 
 	/**
@@ -64,9 +66,10 @@ public class ChessGame extends Observable implements BoardGames{
 		if (ret){
 			ret = echiquier.move(xInit, yInit, xFinal, yFinal);
 		}
+		/*
 		if (ret){
 			echiquier.switchJoueur();
-		}		
+		}		*/
 		
 		this.notifyObservers(echiquier.getPiecesIHM()); 
 		return ret;	

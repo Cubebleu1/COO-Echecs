@@ -60,6 +60,7 @@ public abstract class AbstractChessGameControler implements ChessGameControlers 
 	 * tente de déplacer est bien celle du jeu courant
 	 * la vue se servira de cette information pour empêcher tout déplacement sur le damier
 	 */
+	
 	public abstract boolean isPlayerOK(Coord initCoord) ;
 
 	// Déplacement métier

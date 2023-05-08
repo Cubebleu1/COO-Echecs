@@ -26,7 +26,7 @@ public class ChessGameControler extends AbstractChessGameControler {
 	 */
 	@Override
 	public boolean isPlayerOK(Coord initCoord) {
-		// ToDo
+		return this.chessGame.isPlayerOK(initCoord.x, initCoord.y);
 	}
 	
 	/* (non-Javadoc)
@@ -39,6 +39,8 @@ public class ChessGameControler extends AbstractChessGameControler {
 			String promotionType) {
 		
 	}
+	
+	
 
 	
 }

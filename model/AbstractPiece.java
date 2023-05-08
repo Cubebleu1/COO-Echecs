@@ -30,14 +30,13 @@ public abstract class AbstractPiece implements Pieces {
 	
 	public boolean move(int xFinal, int yFinal) {
 		if (this.isMoveOk(xFinal, yFinal)) {
-			
 			return true;
 		} else {return false;}
 	}
 	
 	public boolean capture() {
 		if (this.getX() + this.getY() == -2) {
-			return false; //Cannot capture if piece is already captures (x = y = -1)
+			return false; //Cannot capture if piece is already captured (x = y = -1)
 		} else {
 			this.coord.x = -1;
 			this.coord.y = -1;
@@ -78,6 +77,8 @@ public abstract class AbstractPiece implements Pieces {
 		System.out.println(monCavalier.move(1, 2)); //True, L-shaped
 		System.out.println(monCavalier.move(2, 40)); //False, out of the board
 		System.out.println(monCavalier); //Update coords
+		Pieces monCavalier2 = new Cavalier(Couleur.BLANC, new Coord(6,7));
+		System.out.println(monCavalier2.move(5, 5));
 		
 		System.out.println("========== TESTS FOU ========== ");
 		Pieces monFou = new Fou(Couleur.BLANC, new Coord(0,0));

@@ -43,7 +43,7 @@ public class ChessImageProvider {
 		key = pieceType + pieceCouleur.name();
 		value = mapImage.get(key);
 		File g=new File("");
-		ret = g.getAbsolutePath()+"\\images\\" + value;
+		ret = g.getAbsolutePath()+File.separator+"images"+File.separator + value; //File seprator : / ou \ en fonction de Windows, Mac ou Ubuntu
 		return ret;		
 	}
 
