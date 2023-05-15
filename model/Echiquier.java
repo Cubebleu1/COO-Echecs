@@ -45,7 +45,7 @@ public class Echiquier implements BoardGames {
 				if (yFinal < yInit && y > -dy) {y = y-1;} else if (yFinal > yInit && y < dy) {y++;}
 				if (this.notCurrentGame.isPieceHere(xInit+x, yInit+y)) {return false;};
 			} 
-		if (this.notCurrentGame.isPieceHere(xFinal, yFinal)) {this.notCurrentGame.capture(xFinal, yFinal);} //Capture ?? But why in Jeu... ?
+		//if (this.notCurrentGame.isPieceHere(xFinal, yFinal)) {System.out.println("capture ?");} //TODO : BAD SRP, is move ok should not initiate capture
 		} 
 		return true;
 	}
@@ -55,6 +55,7 @@ public class Echiquier implements BoardGames {
 		if(!this.isPlayerOK(xInit, yInit)) {return false;} //Wrong player
 		if(this.isMoveOk(xInit, yInit, xFinal, yFinal)) {
 			if (this.currentGame.move(xInit, yInit, xFinal, yFinal)) { //Cascading call to Jeu and corresponding pieces move() method
+				if (this.notCurrentGame.isPieceHere(xFinal, yFinal)) {this.notCurrentGame.capture(xFinal, yFinal);} //capture
 				this.switchJoueur(); //If move was legal, switch player
 				return true;
 			};

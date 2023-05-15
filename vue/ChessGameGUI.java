@@ -25,6 +25,7 @@ import controler.ChessGameControlers;
 import controler.controlerLocal.ChessGameControler;
 import model.Coord;
 import model.Couleur;
+import model.PieceIHM;
 import model.Pieces;
 import model.observable.ChessGame;
 import tools.ChessImageProvider;
@@ -41,7 +42,7 @@ public class ChessGameGUI extends JFrame implements MouseMotionListener, MouseLi
 	JPanel chessBoard; 
 	JLabel chessPiece; //Chess piece being moved
 	int xAdjustment ; int yAdjustment;
-	ChessGameControler controler = new ChessGameControler(new ChessGame());
+	ChessGameControlers controler;
 	Coord coordInit;
 	Coord coordFinal;
 	
@@ -49,6 +50,7 @@ public class ChessGameGUI extends JFrame implements MouseMotionListener, MouseLi
 	// ========== CONSTRUCTORS ==========
 	
 	public ChessGameGUI(String name, ChessGameControlers chessControler, Dimension dim ) {
+		this.controler = chessControler;
 		
 		// Create a Layered Plane for the application
 		this.layeredPane = new JLayeredPane();
@@ -65,6 +67,7 @@ public class ChessGameGUI extends JFrame implements MouseMotionListener, MouseLi
 		this.chessBoard.setBounds(0, 0, dim.width, dim.height); //Resize board to fit layered pane
 		
 		// TODO : How does this works ?
+		
 		for (int i = 0; i < 64; i++) {
 			JPanel square = new JPanel(new BorderLayout()); //Why Border Layout ? Because it is simple
 			this.chessBoard.add(square);
@@ -72,25 +75,6 @@ public class ChessGameGUI extends JFrame implements MouseMotionListener, MouseLi
 			if (row == 0) {square.setBackground( i % 2 == 0 ? Color.black : Color.white );}
 			else {square.setBackground( i % 2 == 0 ? Color.white : Color.black);}
 		}
-		
-		//Create chess Pieces
-		List<Pieces> list = ChessPiecesFactory.newPieces(Couleur.NOIR);
-		for (Pieces piece : list) {
-			String img = ChessImageProvider.getImageFile(piece.getClass().getSimpleName(), Couleur.NOIR);
-			int componentNumber = piece.getY()*8+piece.getX(); //JGridLayout is filled from left to right, top to bottom
-			JLabel label = new JLabel(new ImageIcon(img)); //Chess piece label
-			JPanel panel = (JPanel) this.chessBoard.getComponent(componentNumber);
-			panel.add(label);
-		}
-		list = ChessPiecesFactory.newPieces(Couleur.BLANC);
-		for (Pieces piece : list) {
-			String img = ChessImageProvider.getImageFile(piece.getClass().getSimpleName(), Couleur.BLANC);
-			int componentNumber = piece.getY()*8+piece.getX(); //JGridLayout is filled from left to right, top to bottom
-			JLabel label = new JLabel(new ImageIcon(img)); //Chess piece label
-			JPanel panel = (JPanel) this.chessBoard.getComponent(componentNumber);
-			panel.add(label); //Add JLabel above the JPanel square
-		}
-		
 	}
 	
 	// ========== METHODS ==========
@@ -118,7 +102,7 @@ public class ChessGameGUI extends JFrame implements MouseMotionListener, MouseLi
 		this.chessPiece = null;
 		Component comp = this.chessBoard.findComponentAt(e.getX(), e.getY()); // Get component that was clicked on
 		if (comp instanceof JPanel) return; //If comp is anything else than JLabel, then it's not a chess piece : nothing is done
-		if(this.controler.isPlayerOK(this.toCoords(e.getX(), e.getY()))) {
+		if(this.controler.isPlayerOK(coordInit)) {
 			Point parentLocation = comp.getParent().getLocation(); //Get position of square where the piece is
 			comp.getParent().remove(comp); //Remove chessPiece from it's initial square
 			this.xAdjustment = parentLocation.x - e.getX(); //Get adjustment to chess piece position compared with mouse position
@@ -128,29 +112,19 @@ public class ChessGameGUI extends JFrame implements MouseMotionListener, MouseLi
 			this.chessPiece.setSize(this.chessPiece.getWidth(), this.chessPiece.getHeight()); //prevent piece from changin size when clicked
 			this.layeredPane.add(this.chessPiece, JLayeredPane.DRAG_LAYER);//JLayeredPane.DRAG_LAYER <=> above all components (z=max=400)	
 		}
-		else {System.out.println("KO : C'est au tour de l'autre joueur");}
 	}
-
 	@Override
 	public void mouseReleased(MouseEvent e) {
 		if (this.chessPiece == null) return;
-		this.coordFinal = this.toCoords(e.getX(), e.getY());
-		if (this.controler.move(coordInit, coordFinal)) {
-			this.chessPiece.setVisible(false);
+		else {
+			this.coordFinal = this.toCoords(e.getX(), e.getY());
 			Component comp = this.chessBoard.findComponentAt(e.getX(), e.getY());
-			if (comp instanceof JLabel) { //If chess piece released on another chess piece
-				Container parent = comp.getParent(); //Get Square Jpanel (parent container of the chess piece)
-				parent.remove(0); //0since there is only one possible child to a square Panel : a chess piece JLabel
-				parent.add(this.chessPiece);
-				System.out.println("OK : Mouvement et capture");
-			} else { //Empty square
-				Container c = (Container) comp; //comp is a square JLabel. Cast to container type to use add()
-				c.add(this.chessPiece);
-				System.out.println("OK : Mouvement simple");
-			}
-			//this.layeredPane.remove(this.chessPiece); //Remove dragged piece since it is now placed on chess board
-			this.chessPiece.setVisible(true);
-		} else 	{System.out.println("KO : Mouvement impossible");this.undoMove();}
+			if (this.controler.move(coordInit, coordFinal)) {
+			} else {this.undoMove(); System.out.println("UNDO");}
+			//this.layeredPane.remove(this.chessPiece);
+			this.chessPiece.setVisible(false);
+			this.chessPiece= null;
+		}
 	}
 
 	@Override
@@ -167,7 +141,31 @@ public class ChessGameGUI extends JFrame implements MouseMotionListener, MouseLi
 
 	@Override
 	public void update(Observable o, Object arg) {
-		System.out.println("OBSERVE");	
+		this.clearBoard();
+		if (arg instanceof Iterable) {
+			for (PieceIHM piece : (Iterable<PieceIHM>) arg) {
+				String img = ChessImageProvider.getImageFile(piece.getTypePiece(), piece.getCouleur());
+				List<Coord> coords = piece.getList();
+				for (Coord coord : coords) {
+					int componentNumber = coord.y*8+coord.x; //JGridLayout is filled from left to right, top to bottom
+					JLabel label = new JLabel(new ImageIcon(img)); //Chess piece label
+					JPanel panel = (JPanel) this.chessBoard.getComponent(componentNumber);
+					panel.add(label); //Add JLabel above the JPanel square
+				}
+			}
+		} else {System.err.println("PiecesIHM error");}
+		revalidate();
+		repaint();
+	}
+	
+	public void clearBoard() {
+	    Component[] components = chessBoard.getComponents();
+	    for (Component component : components) {
+	        if (component instanceof JPanel) {
+	            JPanel panel = (JPanel) component;
+	            panel.removeAll(); // Supprime tous les JLabel contenus dans le JPanel
+	        }
+	    }
 	}
 	
 	private Coord toCoords(int x, int y) {

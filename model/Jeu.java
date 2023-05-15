@@ -67,10 +67,10 @@ public class Jeu {
 		} return false;
 	}
 	
-	public boolean capture(int x, int y) {
-		if (this.getPiece(x, y).getClass().getSimpleName().equals("Roi")){System.out.println("Le joueur "+this.getCouleur()+" a perdu...");} //Lost the king => Defeat
-		this.getPiece(x, y).capture(); //Capture this piece (put it's coordinates to (-1;-1))
-		return true; //Is there more to do ? How could a capture be not valid ? TODO TODO 
+	public boolean capture(int xFinal, int yFinal) {
+		if (this.getPiece(xFinal, yFinal).getClass().getSimpleName().equals("Roi")){System.out.println("Le joueur "+this.getCouleur()+" a perdu...");} //Lost the king => Defeat
+		this.getPiece(xFinal, yFinal).capture();//Capture this piece (put it's coordinates to (-1;-1))
+		return false; //Is there more to do ? How could a capture be not valid ? TODO TODO 
 	}
 	
 	

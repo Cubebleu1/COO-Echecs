@@ -39,6 +39,7 @@ public class ChessGameControler extends AbstractChessGameControler {
 			String promotionType) {
 		
 	}
+
 	
 	
 
